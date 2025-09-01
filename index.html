@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>States of Matter: Particle Behavior Simulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .info-panel {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #2196F3;
+            margin-bottom: 20px;
+        }
+        
+        .info-panel h3 {
+            color: #1976D2;
+            margin-bottom: 8px;
+        }
+        
+        .info-panel p {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .control-section {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+            text-align: center;
+        }
+        
+        .control-group {
+            margin-bottom: 12px;
+        }
+        
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #444;
+            font-size: 0.9em;
+        }
+        
+        input[type="range"], button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="range"] {
+            height: 40px;
+            cursor: pointer;
+        }
+        
+        input[type="range"]:hover {
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .legend {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .legend h3 {
+            margin-bottom: 10px;
+            color: #444;
+        }
+        
+        .legend-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .color-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+        
+        .simulation-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .state-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .current-state {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .state-description {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .simulation-canvas {
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            display: block;
+            margin: 0 auto 15px auto;
+        }
+        
+        .simulation-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .temp-display {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .temp-very-cold { color: #0066ff; }
+        .temp-cold { color: #0099ff; }
+        .temp-cool { color: #00ccff; }
+        .temp-warm { color: #ffaa00; }
+        .temp-hot { color: #ff6600; }
+        .temp-very-hot { color: #ff0000; }
+        
+        .state-solid {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 2px solid #1976d2;
+        }
+        
+        .state-liquid {
+            background: #e8f5e8;
+            color: #388e3c;
+            border: 2px solid #388e3c;
+        }
+        
+        .state-gas {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 2px solid #f57c00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 States of Matter: Particle Behavior Simulation</h1>
+        <p class="subtitle">Explore how temperature affects molecular motion in different phases</p>
+        
+        <div class="info-panel">
+            <h3>🎯 How to Use This Simulation</h3>
+            <p><strong>1.</strong> Toggle between solid, liquid, and gas states using the state button<br>
+            <strong>2.</strong> Adjust temperature with the slider to see how particle motion changes<br>
+            <strong>3.</strong> Click START to begin the particle simulation<br>
+            <strong>4.</strong> Compare how the same temperature affects different states of matter</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-section">
+                <div class="section-title">🔬 State Selection</div>
+                <div class="control-group">
+                    <label>Current State:</label>
+                    <button id="stateToggle" class="state-solid">🧊 SOLID STATE</button>
+                </div>
+                
+                <div class="control-group">
+                    <label for="temperature">Temperature:</label>
+                    <input type="range" id="temperature" min="-50" max="200" value="20">
+                    <div class="temp-display" id="tempDisplay">20°C</div>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">⏯️ Simulation Controls</div>
+                <div class="control-group">
+                    <label>Simulation:</label>
+                    <button id="startStop">▶️ START SIMULATION</button>
+                </div>
+                
+                <div class="control-group">
+                    <label>Speed:</label>
+                    <button id="speedToggle">🏃 NORMAL SPEED</button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">📊 Display Options</div>
+                <div class="control-group">
+                    <label>Reset:</label>
+                    <button id="reset">🔄 RESET SIMULATION</button>
+                </div>
+                
+                <div class="control-group">
+                    <label>Particle Trails:</label>
+                    <button id="trailToggle">✨ TRAILS OFF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <h3>Kinetic Energy Color Scale</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="color-box" style="background: #0066ff;"></div>
+                    <span>Very Low KE</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background: #00bbff;"></div>
+                    <span>Low KE</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background: #00ff00;"></div>
+                    <span>Medium KE</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background: #ffaa00;"></div>
+                    <span>High KE</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background: #ff0000;"></div>
+                    <span>Very High KE</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="simulation-container">
+            <div class="state-info">
+                <div>
+                    <div class="current-state" id="currentStateDisplay">Solid State</div>
+                </div>
+            </div>
+            
+            <canvas class="simulation-canvas" id="simulationCanvas" width="800" height="400"></canvas>
+            
+            <div class="simulation-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value" id="currentTemp">20°C</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Avg Speed</div>
+                    <div class="stat-value" id="avgSpeed">0.0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Particle Count</div>
+                    <div class="stat-value" id="particleCount">120</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        class Particle {
+            constructor(x, y, state, temperature, canvasWidth, canvasHeight) {
+                this.x = x;
+                this.y = y;
+                this.state = state; // 'solid', 'liquid', 'gas'
+                this.temperature = temperature;
+                this.canvasWidth = canvasWidth;
+                this.canvasHeight = canvasHeight;
+                
+                // For solid particles, store equilibrium position
+                this.equilibriumX = x;
+                this.equilibriumY = y;
+                
+                this.vx = 0;
+                this.vy = 0;
+                this.radius = 5;
+                
+                // Initialize velocity based on state
+                this.resetVelocity();
+                
+                // Trail history
+                this.trail = [];
+                this.maxTrailLength = 8;
+            }
+            
+            resetVelocity() {
+                const tempFactor = Math.max(0.1, (this.temperature + 50) / 250); // Convert -50 to 200°C to 0-1 scale
+                
+                if (this.state === 'solid') {
+                    // Solids barely move from equilibrium
+                    this.vx = (Math.random() - 0.5) * tempFactor * 0.5;
+                    this.vy = (Math.random() - 0.5) * tempFactor * 0.5;
+                } else if (this.state === 'liquid') {
+                    // Liquids move moderately
+                    this.vx = (Math.random() - 0.5) * tempFactor * 2.5;
+                    this.vy = (Math.random() - 0.5) * tempFactor * 2.5;
+                } else { // gas
+                    // Gases move rapidly
+                    this.vx = (Math.random() - 0.5) * tempFactor * 5;
+                    this.vy = (Math.random() - 0.5) * tempFactor * 5;
+                }
+            }
+            
+            setState(newState) {
+                this.state = newState;
+                
+                if (newState === 'solid') {
+                    // For solid, set new equilibrium position at current location
+                    this.equilibriumX = this.x;
+                    this.equilibriumY = this.y;
+                }
+                
+                this.resetVelocity();
+            }
+            
+            update(speedMult) {
+                // Add to trail
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > this.maxTrailLength) {
+                    this.trail.shift();
+                }
+                
+                const tempFactor = Math.max(0.1, (this.temperature + 50) / 250);
+                
+                if (this.state === 'solid') {
+                    // Solids vibrate around equilibrium position
+                    const vibrationAmplitude = tempFactor * 12.5; // Increased by 25%
+                    const restoreForce = 0.15;
+                    
+                    // Restore toward equilibrium
+                    this.vx += (this.equilibriumX - this.x) * restoreForce;
+                    this.vy += (this.equilibriumY - this.y) * restoreForce;
+                    
+                    // Add random vibration (increased by 25%)
+                    this.vx += (Math.random() - 0.5) * tempFactor * 0.5;
+                    this.vy += (Math.random() - 0.5) * tempFactor * 0.5;
+                    
+                    // Damping
+                    this.vx *= 0.85;
+                    this.vy *= 0.85;
+                    
+                } else if (this.state === 'liquid') {
+                    // Liquids flow freely in overhead view
+                    this.vx += (Math.random() - 0.5) * tempFactor * 0.8;
+                    this.vy += (Math.random() - 0.5) * tempFactor * 0.8;
+                    
+                    // Damping
+                    this.vx *= 0.96;
+                    this.vy *= 0.96;
+                    
+                } else { // gas
+                    // Gases move rapidly and randomly
+                    this.vx += (Math.random() - 0.5) * tempFactor * 1.0;
+                    this.vy += (Math.random() - 0.5) * tempFactor * 1.0;
+                    
+                    // Less damping for gases
+                    this.vx *= 0.99;
+                    this.vy *= 0.99;
+                }
+                
+                // Apply velocity
+                this.x += this.vx * speedMult;
+                this.y += this.vy * speedMult;
+                
+                // Boundary conditions
+                if (this.state === 'solid') {
+                    // Solids stay near equilibrium
+                    const maxDistance = Math.max(5, tempFactor * 20);
+                    const dx = this.x - this.equilibriumX;
+                    const dy = this.y - this.equilibriumY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > maxDistance) {
+                        this.x = this.equilibriumX + (dx / distance) * maxDistance;
+                        this.y = this.equilibriumY + (dy / distance) * maxDistance;
+                        this.vx *= -0.3;
+                        this.vy *= -0.3;
+                    }
+                } else {
+                    // Liquids and gases bounce off walls
+                    if (this.x <= this.radius || this.x >= this.canvasWidth - this.radius) {
+                        this.vx *= -0.8;
+                        this.x = Math.max(this.radius, Math.min(this.canvasWidth - this.radius, this.x));
+                    }
+                    
+                    if (this.y <= this.radius || this.y >= this.canvasHeight - this.radius) {
+                        this.vy *= -0.8;
+                        this.y = Math.max(this.radius, Math.min(this.canvasHeight - this.radius, this.y));
+                    }
+                }
+                
+                // Speed limits
+                const maxSpeed = this.state === 'solid' ? 3 : this.state === 'liquid' ? 6 : 12;
+                const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                if (speed > maxSpeed) {
+                    this.vx = (this.vx / speed) * maxSpeed;
+                    this.vy = (this.vy / speed) * maxSpeed;
+                }
+            }
+            
+            getColor() {
+                // Map temperature to color based on kinetic energy
+                if (this.temperature < -30) return '#0066ff';      // Very cold
+                if (this.temperature < 0) return '#00bbff';        // Cold
+                if (this.temperature < 30) return '#00ff00';       // Cool
+                if (this.temperature < 80) return '#ffaa00';       // Warm
+                if (this.temperature < 150) return '#ff6600';      // Hot
+                return '#ff0000';                                  // Very hot
+            }
+            
+            getSpeed() {
+                return Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+            }
+        }
+        
+        class StatesOfMatterSimulation {
+            constructor() {
+                this.canvas = document.getElementById('simulationCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                
+                this.particles = [];
+                this.currentState = 'solid';
+                this.temperature = 20;
+                
+                this.running = false;
+                this.speedMode = 'normal';
+                this.showTrails = false;
+                
+                this.time = 0;
+                
+                this.initParticles();
+                this.setupEventListeners();
+                this.updateDisplays();
+            }
+            
+            initParticles() {
+                this.particles = [];
+                
+                // Base count for liquids and gases, 25% more for solids
+                const baseCount = 150;
+                const count = this.currentState === 'solid' ? 190 : baseCount; // 190 fills 19×10 grid exactly
+                
+                if (this.currentState === 'solid') {
+                    // Initialize solid particles in a grid with even distribution
+                    // For 188 particles, use 19 columns × 10 rows = 190 positions (use 188)
+                    const cols = 19;
+                    const rows = 10;
+                    const spacingX = (this.canvas.width - 80) / (cols + 1);
+                    const spacingY = (this.canvas.height - 80) / (rows + 1);
+                    
+                    let particleIndex = 0;
+                    for (let row = 0; row < rows && particleIndex < count; row++) {
+                        for (let col = 0; col < cols && particleIndex < count; col++) {
+                            const x = 40 + (col + 1) * spacingX;
+                            const y = 40 + (row + 1) * spacingY;
+                            
+                            this.particles.push(new Particle(
+                                x, y, this.currentState, this.temperature,
+                                this.canvas.width, this.canvas.height
+                            ));
+                            particleIndex++;
+                        }
+                    }
+                } else {
+                    // Initialize liquid/gas particles randomly
+                    for (let i = 0; i < count; i++) {
+                        const x = Math.random() * (this.canvas.width - 60) + 30;
+                        const y = Math.random() * (this.canvas.height - 60) + 30;
+                        
+                        this.particles.push(new Particle(
+                            x, y, this.currentState, this.temperature,
+                            this.canvas.width, this.canvas.height
+                        ));
+                    }
+                }
+                
+                // Update particle count display
+                document.getElementById('particleCount').textContent = count.toString();
+                
+                this.updateStats();
+            }
+            
+            setupEventListeners() {
+                // State toggle button
+                document.getElementById('stateToggle').addEventListener('click', () => {
+                    this.toggleState();
+                });
+                
+                // Temperature slider
+                document.getElementById('temperature').addEventListener('input', (e) => {
+                    this.temperature = parseInt(e.target.value);
+                    this.updateTemperature();
+                    this.updateDisplays();
+                    if (this.running) {
+                        this.pauseSimulation();
+                    }
+                });
+                
+                // Control buttons
+                document.getElementById('startStop').addEventListener('click', () => {
+                    this.toggleSimulation();
+                });
+                
+                document.getElementById('speedToggle').addEventListener('click', () => {
+                    this.toggleSpeed();
+                });
+                
+                document.getElementById('reset').addEventListener('click', () => {
+                    this.resetSimulation();
+                });
+                
+                document.getElementById('trailToggle').addEventListener('click', () => {
+                    this.toggleTrails();
+                });
+            }
+            
+            toggleState() {
+                if (this.currentState === 'solid') {
+                    this.currentState = 'liquid';
+                } else if (this.currentState === 'liquid') {
+                    this.currentState = 'gas';
+                } else {
+                    this.currentState = 'solid';
+                }
+                
+                // Update particles to new state
+                this.particles.forEach(particle => {
+                    particle.setState(this.currentState);
+                    particle.temperature = this.temperature;
+                });
+                
+                // For state transitions, reinitialize positions if needed
+                if (this.currentState === 'solid') {
+                    this.initParticles();
+                }
+                
+                this.updateDisplays();
+                
+                if (this.running) {
+                    this.pauseSimulation();
+                }
+            }
+            
+            updateTemperature() {
+                this.particles.forEach(particle => {
+                    particle.temperature = this.temperature;
+                    particle.resetVelocity();
+                });
+            }
+            
+            updateDisplays() {
+                // Update temperature display
+                document.getElementById('tempDisplay').textContent = this.temperature + '°C';
+                document.getElementById('tempDisplay').className = 'temp-display ' + this.getTempClass(this.temperature);
+                document.getElementById('currentTemp').textContent = this.temperature + '°C';
+                
+                // Update state button and display
+                const stateButton = document.getElementById('stateToggle');
+                const stateDisplay = document.getElementById('currentStateDisplay');
+                
+                if (this.currentState === 'solid') {
+                    stateButton.textContent = '🧊 SOLID STATE';
+                    stateButton.className = 'state-solid';
+                    stateDisplay.textContent = 'Solid State';
+                } else if (this.currentState === 'liquid') {
+                    stateButton.textContent = '💧 LIQUID STATE';
+                    stateButton.className = 'state-liquid';
+                    stateDisplay.textContent = 'Liquid State';
+                } else {
+                    stateButton.textContent = '☁️ GAS STATE';
+                    stateButton.className = 'state-gas';
+                    stateDisplay.textContent = 'Gas State';
+                }
+            }
+            
+            getTempClass(temp) {
+                if (temp < -30) return 'temp-very-cold';
+                if (temp < 0) return 'temp-cold';
+                if (temp < 30) return 'temp-cool';
+                if (temp < 80) return 'temp-warm';
+                if (temp < 150) return 'temp-hot';
+                return 'temp-very-hot';
+            }
+            
+            toggleSimulation() {
+                this.running = !this.running;
+                const button = document.getElementById('startStop');
+                button.textContent = this.running ? '⏸️ PAUSE SIMULATION' : '▶️ START SIMULATION';
+                
+                if (this.running) {
+                    this.animate();
+                }
+            }
+            
+            pauseSimulation() {
+                this.running = false;
+                document.getElementById('startStop').textContent = '▶️ START SIMULATION';
+            }
+            
+            toggleSpeed() {
+                const button = document.getElementById('speedToggle');
+                if (this.speedMode === 'normal') {
+                    this.speedMode = 'slow';
+                    button.textContent = '🐢 SLOW MOTION';
+                } else if (this.speedMode === 'slow') {
+                    this.speedMode = 'double';
+                    button.textContent = '⚡ DOUBLE SPEED';
+                } else {
+                    this.speedMode = 'normal';
+                    button.textContent = '🏃 NORMAL SPEED';
+                }
+            }
+            
+            resetSimulation() {
+                this.running = false;
+                this.speedMode = 'normal';
+                this.time = 0;
+                this.currentState = 'solid';
+                this.temperature = 20;
+                
+                document.getElementById('startStop').textContent = '▶️ START SIMULATION';
+                document.getElementById('speedToggle').textContent = '🏃 NORMAL SPEED';
+                document.getElementById('temperature').value = 20;
+                
+                this.updateDisplays();
+                this.initParticles();
+                this.draw();
+            }
+            
+            toggleTrails() {
+                this.showTrails = !this.showTrails;
+                const button = document.getElementById('trailToggle');
+                button.textContent = this.showTrails ? '✨ TRAILS ON' : '✨ TRAILS OFF';
+            }
+            
+            animate() {
+                if (!this.running) return;
+                
+                let speedMult;
+                switch(this.speedMode) {
+                    case 'slow': speedMult = 0.3; break;
+                    case 'double': speedMult = 2.0; break;
+                    default: speedMult = 1.0; break;
+                }
+                
+                // Update particles
+                this.particles.forEach(particle => {
+                    particle.update(speedMult);
+                });
+                
+                this.draw();
+                
+                // Update stats periodically
+                if (this.time % 30 < (this.speedMode === 'slow' ? 9 : this.speedMode === 'double' ? 60 : 30)) {
+                    this.updateStats();
+                }
+                
+                let timeIncrement;
+                switch(this.speedMode) {
+                    case 'slow': timeIncrement = 0.3; break;
+                    case 'double': timeIncrement = 2.0; break;
+                    default: timeIncrement = 1.0; break;
+                }
+                
+                this.time += timeIncrement;
+                
+                requestAnimationFrame(() => this.animate());
+            }
+            
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.particles.forEach(particle => {
+                    // Draw trails if enabled
+                    if (this.showTrails && particle.trail.length > 1) {
+                        this.ctx.strokeStyle = particle.getColor();
+                        this.ctx.globalAlpha = 0.3;
+                        this.ctx.lineWidth = 2;
+                        this.ctx.beginPath();
+                        particle.trail.forEach((point, index) => {
+                            if (index === 0) this.ctx.moveTo(point.x, point.y);
+                            else this.ctx.lineTo(point.x, point.y);
+                        });
+                        this.ctx.stroke();
+                        this.ctx.globalAlpha = 1;
+                    }
+                    
+                    // Draw particle
+                    this.ctx.fillStyle = particle.getColor();
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Add subtle glow for high-energy particles
+                    if (particle.temperature > 100) {
+                        this.ctx.shadowBlur = (particle.temperature - 100) / 20;
+                        this.ctx.shadowColor = particle.getColor();
+                        this.ctx.beginPath();
+                        this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.shadowBlur = 0;
+                    }
+                });
+            }
+            
+            updateStats() {
+                const avgSpeed = this.particles.reduce((sum, p) => sum + p.getSpeed(), 0) / this.particles.length;
+                document.getElementById('avgSpeed').textContent = avgSpeed.toFixed(1);
+            }
+        }
+        
+        // Initialize simulation
+        const simulation = new StatesOfMatterSimulation();
+        simulation.draw();
+    </script>
+</body>
+</html>
