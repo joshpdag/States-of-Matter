@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>States of Matter: Particle Behavior Simulation</title>
+    <title>States of Matter: Atom Behavior Simulation</title>
     <style>
         * {
             margin: 0;
@@ -200,12 +200,6 @@
             color: #333;
         }
         
-        .state-description {
-            font-size: 0.9em;
-            color: #666;
-            font-style: italic;
-        }
-        
         .simulation-canvas {
             border: 3px solid #ddd;
             border-radius: 10px;
@@ -277,15 +271,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔬 States of Matter: Particle Behavior Simulation</h1>
-        <p class="subtitle">Explore how temperature affects molecular motion in different phases</p>
+        <h1>🔬 States of Matter: Atom Behavior Simulation</h1>
+        <p class="subtitle">Explore how temperature affects atomic motion in different phases</p>
         
         <div class="info-panel">
             <h3>🎯 How to Use This Simulation</h3>
             <p><strong>1.</strong> Toggle between solid, liquid, and gas states using the state button<br>
-            <strong>2.</strong> Adjust temperature with the slider to see how particle motion changes<br>
-            <strong>3.</strong> Click START to begin the particle simulation<br>
-            <strong>4.</strong> Compare how the same temperature affects different states of matter</p>
+            <strong>2.</strong> Adjust temperature with the slider to see how atom motion changes<br>
+            <strong>3.</strong> Click START to begin the atom simulation</p>
         </div>
         
         <div class="controls">
@@ -324,7 +317,7 @@
                 </div>
                 
                 <div class="control-group">
-                    <label>Particle Trails:</label>
+                    <label>Atom Trails:</label>
                     <button id="trailToggle">✨ TRAILS OFF</button>
                 </div>
             </div>
@@ -375,8 +368,8 @@
                     <div class="stat-value" id="avgSpeed">0.0</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-label">Particle Count</div>
-                    <div class="stat-value" id="particleCount">120</div>
+                    <div class="stat-label">Atom Count</div>
+                    <div class="stat-value" id="particleCount">190</div>
                 </div>
             </div>
         </div>
@@ -567,7 +560,7 @@
                 
                 if (this.currentState === 'solid') {
                     // Initialize solid particles in a grid with even distribution
-                    // For 188 particles, use 19 columns × 10 rows = 190 positions (use 188)
+                    // For 190 particles, use 19 columns × 10 rows = 190 positions
                     const cols = 19;
                     const rows = 10;
                     const spacingX = (this.canvas.width - 80) / (cols + 1);
