@@ -467,13 +467,13 @@
                     this.vy *= 0.96;
                     
                 } else { // gas
-                    // Gases move rapidly and randomly
-                    this.vx += (Math.random() - 0.5) * tempFactor * 1.0;
-                    this.vy += (Math.random() - 0.5) * tempFactor * 1.0;
+                    // Gases move rapidly and randomly with minimal interaction
+                    this.vx += (Math.random() - 0.5) * tempFactor * 0.8;
+                    this.vy += (Math.random() - 0.5) * tempFactor * 0.8;
                     
-                    // Less damping for gases
-                    this.vx *= 0.99;
-                    this.vy *= 0.99;
+                    // Almost no damping for gases - they maintain momentum
+                    this.vx *= 0.999;
+                    this.vy *= 0.999;
                 }
                 
                 // Apply velocity
